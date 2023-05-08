@@ -135,6 +135,11 @@ class PromptPipeline(BasePipeline):
             prompts = [x.pop("prompt") for x in metadata]
         else:
             metadata = [{}] * len(prompts)
+            
+        self.tokenizer = tokenizer
+        self.tokenizer.pad_token = "[PAD]"
+        self.tokenizer.pad_token_id = 0
+
 
         model_inputs = tokenizer(
             prompts, truncation=True, padding=False, max_length=max_prompt_length, add_special_tokens=add_special_tokens
@@ -143,7 +148,7 @@ class PromptPipeline(BasePipeline):
         prompts_tokens = model_inputs["input_ids"]
         attention_mask = model_inputs["attention_mask"]
 
-        self.tokenizer = tokenizer
+        
         self.prompts = [
             {"input_ids": tokens, "attention_mask": mask, **metadata}
             for tokens, mask, metadata in zip(prompts_tokens, attention_mask, metadata)
@@ -157,8 +162,7 @@ class PromptPipeline(BasePipeline):
 
     def create_loader(self, batch_size: int, shuffle=False) -> DataLoader:
         def collate_fn(xs):
-#             self.tokenizer.pad_token='[PAD]'
-            self.tokenizer.pad_token_id=0
+
             out = self.tokenizer.pad([{"input_ids": x["input_ids"]} for x in xs], return_tensors="pt")
 
             for key in xs[0]:
