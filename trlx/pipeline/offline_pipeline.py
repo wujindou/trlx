@@ -157,8 +157,8 @@ class PromptPipeline(BasePipeline):
 
     def create_loader(self, batch_size: int, shuffle=False) -> DataLoader:
         def collate_fn(xs):
-            print(self.tokenizer.all_special_tokens)
-            print(self.tokenizer.pad_token)
+#             print(self.tokenizer.all_special_tokens)
+#             print(self.tokenizer.pad_token)
             self.tokenizer.pad_token='[PAD]'
             self.tokenizer.pad_token_id=0
             out = self.tokenizer.pad([{"input_ids": x["input_ids"]} for x in xs], return_tensors="pt")
